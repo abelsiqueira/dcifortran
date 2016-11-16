@@ -448,7 +448,7 @@ C     Functions called by the routine.
 
       INTEGER idamax
       REAL*4  secnds
-      REAL*8  CuterFun, ddot, dnrm2
+      REAL*8  CutestFun, ddot, dnrm2
 
 C     OPEN(unit=555, file='dci.lixo', status='new')
 
@@ -542,7 +542,7 @@ C       LOCAL CONVERGENCE
 
 C       Computing f at xc.
 
-        fc = CuterFun(n, xc)
+        fc = CutestFun(n, xc)
 
 C       Checking for convergence.
 
@@ -617,7 +617,7 @@ C       LOCAL CONVERGENCE
 C       CALCULAR gp
         LimLbd = .TRUE.
         gavail = .FALSE.
-        CALL CuterGrad(n, x, g)
+        CALL CutestGrad(n, x, g)
         CALL NAprojCh(m, n, A, Airow, Apcol, Diag, Mval, Mirow,
      $                mpcol, Mcnel, perm, iperm, DenseRow, lambda,
      $                LimLbd, lbdmax, g, gp, naflag)

@@ -14,11 +14,11 @@
 !
 !     From dciblas : vcmpr, icmpr, vexpn, ifill, vfill.
 !     From the blas: dcopy.
-!     From the cute: csetup, ufn, cofg, ccfg, ugr, csgr, cprod, uprod. 
+!     From the cute: csetup, ufn, cofg, ccfg, ugr, csgr, chprod, uhprod. 
 !
 !     ------------------------------------------------------------------
 
-      SUBROUTINE CuterSetUp(Prob, m, n, lincon, x, lambda)
+      SUBROUTINE CutestSetUp(Prob, m, n, lincon, x, lambda)
 
       ! Function that determines the number of variables and
       ! constraints and the number of fixed variables. It also
@@ -35,7 +35,7 @@
 C     Subroutine parameters.
 
       CHARACTER*10 Prob
-      INTEGER      m, n
+      INTEGER      m, n, st
       REAL*8       lambda(mmax)
       REAL*8       x(nmax)
       LOGICAL      lincon
@@ -83,62 +83,71 @@ C     Opening OUTSDIF.d.
 C     Obtaining the number of variables and constraints and
 C     verifying if the vectors are correctly dimensioned.
 
-      CALL cdimen(ifile, nt, m)
+      CALL CUTEST_cdimen(st, ifile, nt, m)
 
       IF (nt.GT.nmax) THEN
-        WRITE(*,*)'gmm99cute error: Increase nmax to, at least, ',nt
+        WRITE(*,*)'DCI error: Increase nmax to, at least, ',nt
         STOP
       ENDIF
 
       IF (m.GT.mmax) THEN
-        WRITE(*,*)'gmm99cute error: Increase mmax to, at least, ',m
+        WRITE(*,*)'DCI error: Increase mmax to, at least, ',m
         STOP
       ENDIF
 
 C     Calling the setup routine from CUTE.
 
       tf = .FALSE.
-      CALL csetup(ifile, 6, nt, m, x, bl, bu, nmax, equatn, 
-     $            linear, lambda, cl, cu, mmax, tf, tf, tf)
+      CALL CUTEST_csetup(st, ifile, 6, 11, nt, m, x, bl, bu, Lambda, cl,
+     $                   cu, equatn, linear, tf, tf, tf)
 
-      CALL cdimsj(nzj)
+      CALL CUTEST_cdimsj(st, nzj)
 
 C     Checking if amax is big enough.
 
       IF (nzj.GT.amax) THEN
-        WRITE(*,*)'gmm99cute error: Increase amax to, at least, ',nzj
+        WRITE(*,*)'DCI error: Increase amax to, at least, ',nzj
         STOP
       ENDIF
 
 C     Reading the problem name.
 
-      CALL cnames(nt, m, prob, varn, constrn)
+      CALL CUTEST_cnames(st, nt, m, prob, varn, constrn)
 
 C     Checking if all constraints are equations (not inequalities). 
 
       DO i = 1,m
         IF (.NOT.equatn(i)) THEN
-          WRITE(*,*)'There are inequality constraints.'
+          WRITE(*,*)'DCI error: There are inequality constraints.'
           STOP
         ENDIF
-      ENDDO   
+      ENDDO
+
+C     Checking if all variables are free.
+
+      DO i = 1,n
+        IF ((bl(i).GE.-1.0D19).OR.(bu(i).LE.1.0D19)) THEN
+          WRITE(*,*)'DCI error: There are bounded variables.'
+          STOP
+        ENDIF
+      ENDDO
 
 C     Checking if all of the constraints are linear. 
 
-      i = 1
-      DO WHILE ((i.LE.m).AND.(linear(i)))
-        i = i+1
-      ENDDO
-      IF (i.LE.m) THEN
-        lincon = .FALSE.
-        linconstr = .FALSE.
-      ELSE
+C     i = 1
+C     DO WHILE ((i.LE.m).AND.(linear(i)))
+C       i = i+1
+C     ENDDO
+C     IF (i.LE.m) THEN
+C       lincon = .FALSE.
+C       linconstr = .FALSE.
+C     ELSE
 C       This option is temporarily disabled.
 C       lincon = .TRUE.
 C       linconstr = .TRUE.
-        lincon = .FALSE.
-        linconstr = .FALSE.
-      ENDIF   
+C       lincon = .FALSE.
+C       linconstr = .FALSE.
+C     ENDIF   
 
 C     Copying m to mt, that is passed to fun and grad.
 
@@ -148,35 +157,14 @@ C     Checking if all variables are free (i.e., if there are no
 C     bounded variables). Fixed variables are allowed.
 
       nfix = 0
-      n = 0
-      DO i = 1,nt
-        IF (DABS(bu(i)-bl(i)).LT.1.0D-15) THEN
-          xfix(i) = bl(i)
-          vfix(i) = 0
-          nfix = nfix+1
-          FreeV(i) = .FALSE.
-        ELSE 
-          IF ((bl(i).GT.-1.0D-19).OR.(bu(i).LT.1.0D19)) THEN
-            WRITE(*,*)'Ignoring bounds of the ',varn(i),' variable.'
-          ENDIF
-          n = n+1
-          ind(n) = i
-C         rind(i) = n
-          FreeV(i) = .TRUE.
-        ENDIF
-      ENDDO
-
-      IF (nfix.NE.0) THEN
-        WRITE(*,*)'This problem has ',nfix,' fixed variables.'
-        CALL vcmpr(x, x, ind, 1, n)
-      ENDIF
+      n = nt
 
       RETURN
       END
       
 C     ------------------------------------------------------------------
       
-      REAL*8 FUNCTION CuterFun(n, x)
+      REAL*8 FUNCTION CutestFun(n, x)
 
       ! Function that computes f(x), the value of the function
       ! being minimized.
@@ -189,7 +177,7 @@ C     ------------------------------------------------------------------
 
 C     Subroutine parameters.
 
-      INTEGER n
+      INTEGER n, st
       REAL*8  x(n)
 
 C     Variables passed by COMMON statements.
@@ -213,32 +201,32 @@ C     COMMON statements.
       IF (m.EQ.0) THEN
 
         IF (nfix.EQ.0) THEN
-          CALL ufn(nt, x, f)
+          CALL CUTEST_ufn(st, nt, x, f)
         ELSE
           CALL vexpn(x, xfix, ind, 1, n)
-          CALL ufn(nt, xfix, f)
+          CALL CUTEST_ufn(st, nt, xfix, f)
         ENDIF
 
       ELSE
 
         tf = .FALSE.
         IF (nfix.EQ.0) THEN
-          CALL cofg(nt, x, f, void, tf)
+          CALL CUTEST_cofg(st, nt, x, f, void, tf)
         ELSE
           CALL vexpn(x, xfix, ind, 1, n)
-          CALL cofg(nt, xfix, f, void, tf)
+          CALL CUTEST_cofg(st, nt, xfix, f, void, tf)
         ENDIF
  
       ENDIF
 
-      CuterFun=f
+      CutestFun=f
 
       RETURN
       END
 
 C     ------------------------------------------------------------------
       
-      SUBROUTINE CuterConstr(m, n, x, h) 
+      SUBROUTINE CutestConstr(m, n, x, h) 
 
       ! Routine that computes h(x), the constraint values at x.
 
@@ -250,7 +238,7 @@ C     ------------------------------------------------------------------
 
 C     Subroutine parameters.
 
-      INTEGER m, n
+      INTEGER m, n, st
       REAL*8  x(n)
       REAL*8  h(m)
 
@@ -273,10 +261,10 @@ C     COMMON statements.
 
       tf = .FALSE.
       IF (nfix.EQ.0) THEN
-        CALL ccfg(nt, m, x, m, h, tf, m, nt, void, tf)
+        CALL CUTEST_ccfg(st, nt, m, x, h, tf, m, nt, void, tf)
       ELSE
         CALL vexpn(x, xfix, ind, 1, n)
-        CALL ccfg(nt, m, xfix, m, h, tf, m, nt, void, tf)
+        CALL CUTEST_ccfg(st, nt, m, xfix, h, tf, m, nt, void, tf)
       ENDIF 
 
       RETURN
@@ -284,7 +272,7 @@ C     COMMON statements.
 
 C     ------------------------------------------------------------------
       
-      SUBROUTINE CuterGrad(n, x, g) 
+      SUBROUTINE CutestGrad(n, x, g) 
 
       ! Routine that computes g(x), the gradient of f(x).
 
@@ -296,7 +284,7 @@ C     ------------------------------------------------------------------
 
 C     Subroutine parameters.
 
-      INTEGER n
+      INTEGER n, st
       REAL*8  x(n), g(n)
 
 C     Variables passed by COMMON statements.
@@ -330,10 +318,10 @@ C     LOCAL CONVERGENCE
       IF (m.EQ.0) THEN
 
         IF (nfix.EQ.0) THEN
-          CALL ugr(nt, x, g)
+          CALL CUTEST_ugr(st, nt, x, g)
         ELSE
           CALL vexpn(x, xfix, ind, 1, n)
-          CALL ugr(nt, xfix, gv)
+          CALL CUTEST_ugr(st, nt, xfix, gv)
           CALL vcmpr(gv, g, ind, 1, n)
         ENDIF
 
@@ -345,20 +333,20 @@ C     LOCAL CONVERGENCE
 
         tf = .TRUE.
         IF (nfix.EQ.0) THEN
-          CALL cofg(nt, x, f, g, tf)
+          CALL CUTEST_cofg(st, nt, x, f, g, tf)
         ELSE
           CALL vexpn(x, xfix, ind, 1, n)
-          CALL cofg(nt, xfix, f, gv, tf)
+          CALL CUTEST_cofg(st, nt, xfix, f, gv, tf)
           CALL vcmpr(gv, g, ind, 1, n)
         ENDIF
  
       ELSE IF (forcegrad) THEN
 
         IF (nfix.EQ.0) THEN
-          CALL ugr(nt, x, g)
+          CALL CUTEST_ugr(st, nt, x, g)
         ELSE
           CALL vexpn(x, xfix, ind, 1, n)
-          CALL ugr(nt, xfix, gv)
+          CALL CUTEST_ugr(st, nt, xfix, gv)
           CALL vcmpr(gv, g, ind, 1, n)
         ENDIF
 
@@ -522,7 +510,7 @@ C     Compressing g and Apcol if there are fixed variables.
 
 C     ------------------------------------------------------------------
       
-      SUBROUTINE CuterJacob(m, n, x, A, Airow, Apcol) 
+      SUBROUTINE CutestJacob(m, n, x, A, Airow, Apcol) 
       
 C     Computes A, the Jacobian of the constraints. Also computes g, 
 C     the gradient of f(x). Warning: A is mxn and not nxm,as usual. 
@@ -546,7 +534,7 @@ C     must be set to FALSE. This is also done here.
     
 C     Subroutine parameters.
 
-      INTEGER m, n
+      INTEGER m, n, st
       INTEGER Airow(amax)
       INTEGER Apcol(n+1)
       REAL*8  x(n)
@@ -581,10 +569,12 @@ C     COMMON / dcirevind    / rind
 
       tf = .FALSE.
       IF (nfix.EQ.0) THEN
-        CALL csgr(nt, m, tf, m, void, x, nJ, amax, J, Jicol, Jirow)
+        CALL CUTEST_csgr(st, nt, m, x, void, tf, nJ, amax, J, Jicol,
+     $                  Jirow)
       ELSE
         CALL vexpn(x, xfix, ind, 1, n)
-        CALL csgr(nt, m, tf, m, void, xfix, nJ, amax, J, Jicol, Jirow)
+        CALL CUTEST_csgr(st, nt, m, xfix, void, tf, nJ, amax, J, Jicol,
+     $                  Jirow)
       ENDIF
       
 C     Generating A and g.
@@ -605,7 +595,7 @@ C     Generating A and g.
       
 C     ------------------------------------------------------------------
 
-      SUBROUTINE CuterHprod(n, m, x, Lambda, v, Hv, GotH)
+      SUBROUTINE CutestHprod(n, m, x, Lambda, v, Hv, GotH)
 
 C     Computes the product Hv = H*v at (x, Lambda), where H is the 
 C     Hessian of the Lagrangian. 
@@ -622,7 +612,7 @@ C     GotH must be set to .FALSE. whenever the point is changed.
 
 C     Subroutine parameters.
 
-      INTEGER m, n
+      INTEGER m, n, st
       REAL*8  x(n), v(n), Hv(n)
       REAL*8  Lambda(m) 
       LOGICAL GotH
@@ -643,9 +633,9 @@ C     COMMON statements.
       IF (nfix.EQ.0) THEN
 
         IF (m.GT.0) THEN    
-          CALL cprod(nt, m, GotH, x, m, Lambda, v, Hv)
+          CALL CUTEST_chprod(st, nt, m, GotH, x, Lambda, v, Hv)
         ELSE
-          CALL uprod(nt, GotH, x, v, Hv)
+          CALL CUTEST_uhprod(st, nt, GotH, x, v, Hv)
         ENDIF
 
       ELSE
@@ -653,9 +643,9 @@ C     COMMON statements.
         CALL vexpn(x, xfix, ind, 1, n)
         CALL vexpn(v, vfix, ind, 1, n)
         IF (m.GT.0) THEN    
-          CALL cprod(nt, m, GotH, xfix, m, Lambda, vfix, Hv)
+          CALL CUTEST_chprod(st, nt, m, GotH, xfix, Lambda, vfix, Hv)
         ELSE
-          CALL uprod(nt, GotH, xfix, vfix, Hv)
+          CALL CUTEST_uhprod(st, nt, GotH, xfix, vfix, Hv)
         ENDIF
         CALL vcmpr(Hv, Hv, ind, 1, n)
 

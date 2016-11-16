@@ -71,7 +71,7 @@ C     COMMON / dcitotvar    / nt
 C     COMMON / dcitotconstr / m
 C     COMMON / dcifixtype   / FreeV
 
-      CALL CuterSetUp(Prob, m, n, lincon, x, lambda)
+      CALL CutestSetUp(Prob, m, n, lincon, x, lambda)
 
       CALL DCI(m, n, lincon, x, lambda, fx, h, iter, ierr) 
 C    $         Fun, Constr, Grad, Jacob, Hprod)

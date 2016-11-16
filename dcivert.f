@@ -246,12 +246,12 @@ C INSERIR NOVO CRITÉRIO AQUI (USANDO UM EXPOENTE)
 C         Recomputing g and A.
 
           IF (.NOT.lincon) THEN
-            CALL CuterJacob(m, n, xc, A, Airow, Apcol)
+            CALL CutestJacob(m, n, xc, A, Airow, Apcol)
             nJacob = nJacob + 1
           ENDIF
           Aavail = .TRUE.
 
-          CALL CuterGrad(n, xc, g)
+          CALL CutestGrad(n, xc, g)
           nGrad = nGrad + 1
           gavail = .TRUE.
 
@@ -290,7 +290,7 @@ c$$$          ENDIF
 
         ELSE
 
-          CALL CuterGrad(n, xc, g)
+          CALL CutestGrad(n, xc, g)
           nGrad = nGrad + 1
 
           CALL dcopy(n, g, 1, gp, 1)
@@ -351,7 +351,7 @@ C           The trust region algorithm is not working.
 C           Calling the BFGS routine.
 
             IF (.NOT.lincon) THEN
-              CALL CuterJacob(m, n, xc, A, Airow, Apcol)
+              CALL CutestJacob(m, n, xc, A, Airow, Apcol)
               nJacob = nJacob + 1
             ENDIF
             Aavail = .TRUE.
@@ -407,7 +407,7 @@ C           Recomputing A, L, and perm because hnorm was
 C           not sufficiently reduced.
 
             IF (.NOT.lincon) THEN
-              CALL CuterJacob(m, n, xc, A, Airow, Apcol)
+              CALL CutestJacob(m, n, xc, A, Airow, Apcol)
               nJacob = nJacob + 1
             ENDIF
             Aavail = .TRUE.
@@ -437,7 +437,7 @@ C       Recomputing A and its Cholesky decomposition, if necessary.
 
         IF (.NOT.Aavail) THEN
           IF (.NOT.lincon) THEN
-            CALL CuterJacob(m, n, xc, A, Airow, Apcol)
+            CALL CutestJacob(m, n, xc, A, Airow, Apcol)
             nJacob = nJacob + 1
           ENDIF
           Aavail = .TRUE.
@@ -452,7 +452,7 @@ C       Recomputing A and its Cholesky decomposition, if necessary.
 
 C         Computing g.
 
-          CALL CuterGrad(n, xc, g)
+          CALL CutestGrad(n, xc, g)
           nGrad = nGrad + 1
 
 C         Computing gp and lambda.

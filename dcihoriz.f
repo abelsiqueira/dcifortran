@@ -157,7 +157,7 @@ C     Internal variables.
 C     Functions called by the routine.
 
       INTEGER idamax
-      REAL*8  CuterFun, ddot, dnrm2
+      REAL*8  CutestFun, ddot, dnrm2
 
 C     Setting up a few parameters.
 
@@ -195,7 +195,7 @@ C       Computing xnew and h(xnew).
 
         CALL dcopy(n, xc, 1, xnew, 1)
         CALL daxpy(n, 1.0D0, s, 1, xnew, 1)
-        CALL CuterConstr(m, n, xnew, hnew)
+        CALL CutestConstr(m, n, xnew, hnew)
         nConstr = nConstr + 1
         hnnew = dnrm2(m, hnew, 1)
         IF ((flag.EQ.1).OR.(flag.EQ.2)) THEN
@@ -235,7 +235,7 @@ c$$$          ENDIF
           ENDIF
           CALL dcopy(n, xc, 1, xnew, 1)
           CALL daxpy(n, 1.0D0, ssoc, 1, xnew, 1)
-          CALL CuterConstr(m, n, xnew, hnew)
+          CALL CutestConstr(m, n, xnew, hnew)
           nConstr = nConstr + 1
           hnnew = dnrm2(m, hnew, 1)
           nSoc = nSoc + 1
@@ -244,7 +244,7 @@ c$$$          ENDIF
 
 C       Computing the expected reduction of the Lagrangian.
 
-        fnew = CuterFun(n, xnew)
+        fnew = CutestFun(n, xnew)
         nFun = nFun + 1
         Lnew = fnew + ddot(m, lambda, 1, hnew, 1)
         DLh = Lnew - Lc

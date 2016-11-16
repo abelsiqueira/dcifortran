@@ -374,7 +374,7 @@ C    *                         Fun, Grad, Constr, Jacob)
 !     Functions called by the routine.
 
       INTEGER idamax
-      REAL*8  CuterFun, dnrm2, ddot
+      REAL*8  CutestFun, dnrm2, ddot
       
 !     Setting up some obvious initial values.
 
@@ -414,15 +414,15 @@ C    *                         Fun, Grad, Constr, Jacob)
 !     Computing f(x), g(x), h(x), ||h(x)||, A(x), Ln, gp, lambda  and
 !     possibly the Cholesky decomposition of A*A'.
 
-      fx = CuterFun(n, x)
+      fx = CutestFun(n, x)
 
       IF (m.GT.0) THEN
 
-        CALL CuterConstr(m, n, x, h)        
+        CALL CutestConstr(m, n, x, h)        
         hnorm = dnrm2(m, h, 1)
         hnormi = DABS(h(idamax(m, h, 1)))
-        CALL CuterJacob(m, n, x, A, Airow, Apcol)
-        CALL CuterGrad(n, x, g)
+        CALL CutestJacob(m, n, x, A, Airow, Apcol)
+        CALL CutestGrad(n, x, g)
         nConstr = 1
         nJacob  = 1
 
@@ -465,7 +465,7 @@ C         Computing gp and lambda.
         Ln = fx + ddot(m, lambda, 1, h, 1)
 
       ELSE
-        CALL CuterGrad(n, x, g)
+        CALL CutestGrad(n, x, g)
         hnorm  = 0.0D0
         hnormi = 0.0D0
         Ln = fx
@@ -650,7 +650,7 @@ C     Variables passed by COMMON statements.
 
 C     Local variables.
 
-      INTEGER       i, ioerr
+      INTEGER       i, ioerr, st
       CHARACTER*42  prob
       CHARACTER*10  varn(nmax)
       CHARACTER*10  constrn(mmax)
@@ -668,7 +668,7 @@ C     COMMON statements.
 
 C     Reading problem, variable and constraint names.
 
-      CALL cnames(nt,m,prob,varn,constrn)
+      CALL CUTEST_cnames(st,nt,m,prob,varn,constrn)
 
 C     Opening the output file.
 
@@ -830,7 +830,7 @@ C     Variables passed by COMMON statements.
 
 C     Local variables.
 
-      INTEGER       ioerr
+      INTEGER       ioerr, st
       REAL*8        hnormi
       CHARACTER*42  prob
       CHARACTER*10  varn(nmax)
@@ -847,7 +847,7 @@ C     COMMON statement.
 
 C     Reading problem, variable and constraint names.
 
-      CALL cnames(nt,m,prob,varn,constrn)
+      CALL CUTEST_cnames(st,nt,m,prob,varn,constrn)
 
 C     Opening the output file.
 

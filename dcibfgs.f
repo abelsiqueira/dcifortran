@@ -312,7 +312,7 @@ C       Computing phi(lambda).
   
         CALL dcopy(n, x0, 1, x, 1)
         CALL daxpy(n, lambda, d, 1, x, 1)
-        CALL CuterConstr(m, n, x, h)
+        CALL CutestConstr(m, n, x, h)
         nConstr = nConstr + 1
         f = 0.5D0*ddot(m, h, 1, h, 1)
   
@@ -330,7 +330,7 @@ C       Zooming if the step is too large and need to be reduced.
 
 C       Computing phi'(lambda).
     
-        CALL CuterJacob(m, n, x, A, Airow, Apcol)
+        CALL CutestJacob(m, n, x, A, Airow, Apcol)
         nJacob = nJacob + 1
         CALL MtVprod(n, A, h, g, Airow, Apcol) 
         gtd = ddot(n, g, 1, d, 1)
@@ -436,7 +436,7 @@ C       Evaluating phi(lambda).
     
         CALL dcopy(n, x0, 1, x, 1)
         CALL daxpy(n, lambda, d, 1, x, 1)
-        CALL CuterConstr(m, n, x, h)
+        CALL CutestConstr(m, n, x, h)
         nConstr = nConstr + 1
         f = 0.5D0*ddot(m, h, 1, h, 1)
   
@@ -453,7 +453,7 @@ C         The sufficient decrease condition was not satisfied.
       
 C         Computing phi'(lambda).
     
-          CALL CuterJacob(m, n, x, A, Airow, Apcol)
+          CALL CutestJacob(m, n, x, A, Airow, Apcol)
           nJacob = nJacob + 1
           CALL MtVprod(n, A, h, g, Airow, Apcol) 
           gtd = ddot(n, g, 1, d, 1)
@@ -490,7 +490,7 @@ C       The sufficient decrease condition was not satisfied.
 C       Recomputing phi'.
     
         IF (ishi) THEN
-          CALL CuterJacob(m, n, x, A, Airow, Apcol)
+          CALL CutestJacob(m, n, x, A, Airow, Apcol)
           nJacob = nJacob + 1
           CALL MtVprod(n, A, h, g, Airow, Apcol) 
           gtd = ddot(n, g, 1, d, 1)

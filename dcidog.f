@@ -238,7 +238,7 @@ C       Computing the new point, xc, and h(xc).
 
         CALL dcopy(n, x, 1, xc, 1)
         CALL daxpy(n, 1.0D0, d, 1, xc, 1)
-        CALL CuterConstr(m, n, xc, hc)
+        CALL CutestConstr(m, n, xc, hc)
         nConstr = nConstr + 1
         hcnorm = dnrm2(m, hc, 1)
 

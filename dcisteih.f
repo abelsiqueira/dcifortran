@@ -147,7 +147,7 @@ C     gp is the initial residual vector r.
      &         (iter.LE.maxit))
 
         iter = iter+1
-        CALL CuterHprod(n, m, x, lambda, p, u, GotH)
+        CALL CutestHprod(n, m, x, lambda, p, u, GotH)
         nHprod = nHprod + 1
         gamma = ddot(n, p, 1, u, 1)
         stu = ddot(n, s, 1, u, 1)
