@@ -5,7 +5,7 @@ AMD_DIR = $(HOME)/Libraries/AMD
 F77 = gfortran
 #DCIFLAGS = -g -pg
 #DCIFLAGS = -O3 -m64 -parallel -mcmodel=medium -shared-intel -L/home/chico/GotoBLAS -lgoto -liomp5 -lpthread
-DCIFLAGS = -O3 -L$(GOTOBLAS) -lpthread -g
+DCIFLAGS = -O3 -L$(GOTOBLAS) -lpthread -g -lrt
 BLAS_LIBS = -L$(GOTOBLAS) -lgoto
 #BLAS_LIBS = -L/opt/intel/mkl/8.0.1/lib/32 -lmkl_ia32 -lguide -lpthread
 AMD_LIB = $(AMD_DIR)/Lib/libamdf77.a

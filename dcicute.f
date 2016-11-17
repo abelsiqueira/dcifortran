@@ -125,7 +125,7 @@ C     Checking if all constraints are equations (not inequalities).
 
 C     Checking if all variables are free.
 
-      DO i = 1,n
+      DO i = 1,nt
         IF ((bl(i).GE.-1.0D19).OR.(bu(i).LE.1.0D19)) THEN
           WRITE(*,*)'DCI error: There are bounded variables.'
           STOP

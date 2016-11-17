@@ -8,7 +8,8 @@
 !     External routines called by this module:
 !
 !     From dcicute : Fun, Constr, Grad, Jacob, Hprod.
-!     From dciio   : ReadParameters, InitialValues, KPrint, LastPrint.
+!     From dciio   : ReadParameters, InitialValues, KPrint, LastPrint,
+!                    dbgprnt
 !     From dcivert : dcivert.
 !     From dcihoriz: dcihoriz.
 !     From the blas: ddot.
@@ -400,7 +401,7 @@ C     Parameters.
 C     Parameters read from disk.
 
       INTEGER maxrest, maxitst, minitst, maxitcg, minitcg, maxit
-      INTEGER maxssmll, prnt, solprnt, tabprnt, prcndiag
+      INTEGER maxssmll, prnt, solprnt, tabprnt, dbgprnt, prcndiag
       INTEGER nfailv, bfgsupd, nstpmaxb, DenseWin
       REAL*8  csih, csig, rhomin, phi1, phi2, EpsChol, lbdmax
       REAL*8  kappa1, kappa2, kappa3, kappa4, DenseFrc
@@ -458,7 +459,8 @@ C     LOCAL CONVERGENCE
 C     Setting up constants.
 
       CALL ReadParameters(maxrest, maxitst, minitst, maxitcg, minitcg, 
-     &                    maxit, maxssmll, prnt, solprnt, tabprnt, 
+     &                    maxit, maxssmll, prnt, solprnt, tabprnt,
+     &                    dbgprnt,
      &                    nfailv, bfgsupd, nstpmaxb, DenseWin, prcndiag, 
      &                    solpath, tabpath, relitst, relitcg, csih, 
      &                    csig, rhomin, phi1, phi2, kappa1, kappa2,  
@@ -623,7 +625,9 @@ C       CALCULAR gp
      $                LimLbd, lbdmax, g, gp, naflag)
         ngpxk = dnrm2(n, gp, 1)
 C       IMPRIMIR
-        PRINT *,"|gp(xk)|/|gp(xck)| = ", ngpxk/ngpxck
+        if (dbgprnt.gt.0) THEN
+          PRINT *,"|gp(xk)|/|gp(xck)| = ", ngpxk/ngpxck
+        endif
 
 C       Printing some information about the current iteration.          
           

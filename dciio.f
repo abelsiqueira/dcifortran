@@ -71,7 +71,8 @@ C     ------------------------------------------------------------------
 
       SUBROUTINE ReadParameters(maxrest, maxitst, minitst, maxitcg, 
      &                          minitcg, maxit, maxssmll, prnt, solprnt, 
-     &                          tabprnt, nfailv, bfgsupd, nstpmaxb, 
+     &                          tabprnt, dbgprnt, nfailv, bfgsupd,
+     &                          nstpmaxb, 
      &                          DenseWin, prcndiag, solpath, tabpath, 
      &                          relitst, relitcg, csih, csig, rhomin,  
      &                          phi1, phi2, kappa1, kappa2, kappa3,  
@@ -87,7 +88,7 @@ C     ------------------------------------------------------------------
       IMPLICIT NONE
 
       INTEGER       maxrest, maxitst, minitst, maxitcg, minitcg, maxit
-      INTEGER       maxssmll, prnt, solprnt, tabprnt, PrcnDiag
+      INTEGER       maxssmll, prnt, solprnt, tabprnt, dbgprnt, PrcnDiag
       INTEGER       stat, nfailv, bfgsupd, nstpmaxb, DenseWin
       REAL*8        csih, csig, rhomin, phi1, phi2, delta0, stepmaxb
       REAL*8        kappa1, kappa2, kappa3, kappa4
@@ -110,6 +111,7 @@ C     ------------------------------------------------------------------
       tabpath  = '.'
       solprnt  = 0
       tabprnt  = 1
+      dbgprnt  = 0
       maxrest  = 20000
       maxitst  = 100000
       minitst  = 100
@@ -201,6 +203,8 @@ C     ------------------------------------------------------------------
             READ(val, fmt=*, iostat=stat) solprnt
           ELSE IF (name.EQ.'TABPRNT   ') THEN
             READ(val, fmt=*, iostat=stat) tabprnt
+          ELSE IF (name.EQ.'DBGPRNT   ') THEN
+            READ(val, fmt=*, iostat=stat) dbgprnt
           ELSE IF (name.EQ.'NFAILV    ') THEN
             READ(val, fmt=*, iostat=stat) nfailv
           ELSE IF (name.EQ.'BFGSUPD   ') THEN
